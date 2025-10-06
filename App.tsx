@@ -6,7 +6,7 @@ import { SmartPatientInterface } from './components/SmartPatientInterface';
 import { DoctorDashboard } from './components/DoctorDashboard';
 import { EmailNotificationDemo } from './components/EmailNotificationDemo';
 import { emailService } from './services/emailService';
-import './utils/emailCheck'; // Автоматическая проверка email конфигурации в dev режиме
+// Email status check initialization is done in useEffect to avoid SSR issues
 
 type AppState = 'home' | 'screening' | 'doctor' | 'doctor-auth';
 
@@ -86,6 +86,15 @@ export default function App() {
       }, 100);
     }
   }, [registrationStep]);
+
+  // Initialize email status check in browser only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      import('./utils/emailCheck').then(({ initEmailStatusCheck }) => {
+        initEmailStatusCheck();
+      }).catch(console.warn);
+    }
+  }, []);
 
   // Global state for test results and access codes
   const [testResults, setTestResults] = useState<TestResult[]>([]);
